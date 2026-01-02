@@ -1,0 +1,181 @@
+{
+  "brand_identity": {
+    "name": "Sightspectrum",
+    "aesthetic": "Professional, Corporate, Data-Driven, Control Room",
+    "logo_url": "https://customer-assets.emergentagent.com/job_4424ce99-107e-4271-9ac9-bef9add8255c/artifacts/7ou0bag7_download.jpg"
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Manrope, sans-serif",
+      "body": "Public Sans, sans-serif",
+      "data": "JetBrains Mono, monospace"
+    },
+    "weights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700,
+      "black": 800
+    },
+    "sizes": {
+      "h1": "text-4xl md:text-5xl font-bold tracking-tight",
+      "h2": "text-3xl font-semibold tracking-tight",
+      "h3": "text-2xl font-semibold",
+      "h4": "text-xl font-medium",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm text-muted-foreground",
+      "tiny": "text-xs uppercase tracking-wider font-semibold"
+    },
+    "imports": [
+      "@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700;800&family=Public+Sans:wght@300;400;500;600;700&display=swap');"
+    ]
+  },
+  "colors": {
+    "primary": {
+      "hex": "#0A2A43",
+      "tailwind": "bg-[#0A2A43] text-white",
+      "hsl": "206 74% 15%",
+      "description": "Deep Navy - Main Brand Color, Sidebar, Primary Buttons"
+    },
+    "accent": {
+      "hex": "#2C6AA6",
+      "tailwind": "bg-[#2C6AA6] text-white",
+      "hsl": "210 58% 41%",
+      "description": "Bright Blue - Active States, Links, Highlights"
+    },
+    "secondary": {
+      "hex": "#9B6CC9",
+      "tailwind": "bg-[#9B6CC9] text-white",
+      "hsl": "270 46% 60%",
+      "description": "Purple - Opportunities, Wins, Creative Accents"
+    },
+    "background": {
+      "hex": "#F5F7FA",
+      "tailwind": "bg-[#F5F7FA]",
+      "hsl": "216 33% 97%",
+      "description": "Light Grey - App Background"
+    },
+    "surface": {
+      "hex": "#FFFFFF",
+      "tailwind": "bg-white",
+      "hsl": "0 0% 100%",
+      "description": "Cards, Modals, Dropdowns"
+    },
+    "success": {
+      "hex": "#10B981",
+      "tailwind": "text-emerald-500",
+      "hsl": "151 84% 39%"
+    },
+    "error": {
+      "hex": "#EF4444",
+      "tailwind": "text-red-500",
+      "hsl": "0 84% 60%"
+    },
+    "border": {
+      "hex": "#E2E8F0",
+      "tailwind": "border-slate-200",
+      "hsl": "214 32% 91%"
+    }
+  },
+  "visual_enhancers": {
+    "shadows": {
+      "card": "shadow-[0_2px_8px_rgba(10,42,67,0.08)]",
+      "hover": "shadow-[0_8px_24px_rgba(10,42,67,0.12)]",
+      "dropdown": "shadow-xl border border-slate-100"
+    },
+    "borders": {
+      "default": "border border-slate-200",
+      "active": "border-l-4 border-[#2C6AA6]",
+      "glass": "border border-white/20"
+    },
+    "radius": {
+      "card": "rounded-xl",
+      "button": "rounded-md",
+      "input": "rounded-md"
+    },
+    "glassmorphism": {
+      "header": "bg-white/80 backdrop-blur-md border-b border-slate-200/50 supports-[backdrop-filter]:bg-white/60"
+    }
+  },
+  "grids": {
+    "dashboard": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6",
+    "form": "grid grid-cols-1 md:grid-cols-2 gap-6",
+    "card_list": "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+  },
+  "layouts": {
+    "main_wrapper": "flex h-screen bg-[#F5F7FA] overflow-hidden",
+    "sidebar": "w-64 bg-[#0A2A43] text-white flex-shrink-0 hidden md:flex flex-col",
+    "content_area": "flex-1 flex flex-col overflow-hidden",
+    "page_container": "flex-1 overflow-y-auto p-6 md:p-8 lg:p-10",
+    "section_header": "flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
+  },
+  "components": {
+    "Button": {
+      "base": "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+      "variants": {
+        "default": "bg-[#0A2A43] text-white hover:bg-[#0A2A43]/90 shadow-sm",
+        "secondary": "bg-[#F5F7FA] text-[#0A2A43] hover:bg-[#E2E8F0]",
+        "outline": "border border-slate-300 bg-transparent hover:bg-slate-50 text-[#0A2A43]",
+        "ghost": "hover:bg-slate-100 hover:text-[#0A2A43]",
+        "link": "text-[#2C6AA6] underline-offset-4 hover:underline"
+      }
+    },
+    "Card": {
+      "base": "rounded-xl border border-slate-200 bg-white text-slate-950 shadow-[0_2px_8px_rgba(10,42,67,0.04)]"
+    },
+    "Input": {
+      "base": "flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C6AA6] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    },
+    "Table": {
+      "wrapper": "relative w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-sm",
+      "header": "bg-slate-50 text-slate-700 font-semibold uppercase text-xs tracking-wider",
+      "row": "hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0"
+    }
+  },
+  "motion": {
+    "page_transition": {
+      "initial": { "opacity": 0, "y": 10 },
+      "animate": { "opacity": 1, "y": 0 },
+      "exit": { "opacity": 0, "y": -10 },
+      "transition": { "duration": 0.3, "ease": "easeOut" }
+    },
+    "list_item": {
+      "initial": { "opacity": 0, "x": -20 },
+      "animate": { "opacity": 1, "x": 0 },
+      "transition": { "type": "spring", "stiffness": 300, "damping": 24 }
+    },
+    "hover_scale": {
+      "whileHover": { "scale": 1.02 },
+      "whileTap": { "scale": 0.98 }
+    }
+  },
+  "image_urls": {
+    "login_bg": "https://images.pexels.com/photos/35083558/pexels-photo-35083558.jpeg",
+    "user_avatar": "https://images.pexels.com/photos/35016587/pexels-photo-35016587.jpeg",
+    "logo_placeholder": "https://images.pexels.com/photos/9843189/pexels-photo-9843189.jpeg",
+    "empty_state": "https://images.pexels.com/photos/35050392/pexels-photo-35050392.jpeg"
+  },
+  "instructions_to_main_agent": [
+    "1. INSTALL DEPENDENCIES: Run 'yarn add framer-motion recharts lucide-react date-fns react-day-picker clsx tailwind-merge @radix-ui/react-slot @radix-ui/react-dropdown-menu @radix-ui/react-dialog @radix-ui/react-avatar @radix-ui/react-separator @radix-ui/react-tooltip @radix-ui/react-popover @radix-ui/react-select @radix-ui/react-label @radix-ui/react-checkbox @radix-ui/react-switch @radix-ui/react-tabs @radix-ui/react-scroll-area'.",
+    "2. UPDATE CSS: Replace the contents of '/app/frontend/src/index.css' with the CSS variables derived from the 'colors' section above (convert Hex to HSL).",
+    "3. FONT SETUP: Add the Google Fonts import to the top of 'index.css'.",
+    "4. LAYOUT: Create a 'Layout.js' component that includes the Sidebar (Left) and Navbar (Top). The Sidebar must use the Primary Color (#0A2A43).",
+    "5. DASHBOARD: Implement the 'Control Room' grid. Use 'recharts' for the analytics widgets.",
+    "6. TABLES: Create a reusable 'DataTable' component with sorting, filtering, and pagination. Use the 'Table' styles defined above.",
+    "7. FORMS: Use 'react-hook-form' with 'zod' for validation. Style inputs using the 'Input' styles.",
+    "8. AUTH: Create a Login page with the 'login_bg' image as a side panel or background.",
+    "9. DATA-TESTID: Ensure EVERY interactive element (buttons, inputs, links) has a 'data-testid' attribute (e.g., 'login-submit-btn', 'client-table-row-1').",
+    "10. MOCK DATA: Since the backend might not be fully populated, create a 'mockData.js' file to populate the dashboard and tables for the MVP."
+  ],
+  "UNIVERSAL_GUIDELINES": [
+    "DO NOT use generic gradients. Use solid colors or subtle textures.",
+    "Ensure high contrast for text. Use 'text-slate-900' for headings and 'text-slate-600' for body.",
+    "Use 'Manrope' for all headings to give a modern, geometric feel.",
+    "Use 'JetBrains Mono' for all financial data, IDs, and code snippets.",
+    "Add 'framer-motion' layout animations to all page transitions.",
+    "Never leave an empty state blank. Use an illustration or icon with a helpful message.",
+    "The Sidebar should be collapsible on mobile.",
+    "Use 'sonner' for all toast notifications."
+  ]
+}

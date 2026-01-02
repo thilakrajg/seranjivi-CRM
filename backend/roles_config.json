@@ -1,0 +1,65 @@
+{
+  "Super Admin": {
+    "description": "Full access to all modules and operations, including database operations.",
+    "permissions": {
+      "users": ["create", "read", "update", "delete"],
+      "roles": ["create", "read", "update", "delete"],
+      "leads": ["create", "read", "update", "delete"],
+      "opportunities": ["create", "read", "update", "delete"],
+      "action_items": ["create", "read", "update", "delete"],
+      "contacts": ["create", "read", "update", "delete"],
+      "sales_activity": ["create", "read", "update", "delete"],
+      "database": ["read", "write"]
+    }
+  },
+  "Admin / Founder": {
+    "description": "All access except database operations.",
+    "permissions": {
+      "users": ["create", "read", "update", "delete"],
+      "roles": ["create", "read", "update", "delete"],
+      "leads": ["create", "read", "update", "delete"],
+      "opportunities": ["create", "read", "update", "delete"],
+      "action_items": ["create", "read", "update", "delete"],
+      "contacts": ["create", "read", "update", "delete"],
+      "sales_activity": ["create", "read", "update", "delete"]
+    }
+  },
+  "Presales Consultant": {
+    "description": "Access to leads, opportunities, and action items.",
+    "permissions": {
+      "leads": ["create", "read", "update"],
+      "opportunities": ["create", "read", "update"],
+      "action_items": ["create", "read", "update"]
+    }
+  },
+  "Presales Lead": {
+    "description": "Access to leads, opportunities, and action items with team oversight.",
+    "permissions": {
+      "leads": ["create", "read", "update"],
+      "opportunities": ["create", "read", "update"],
+      "action_items": ["create", "read", "update"]
+    }
+  },
+  "Presales Manager": {
+    "description": "Access to leads, opportunities, action items, and contacts.",
+    "permissions": {
+      "leads": ["create", "read", "update", "delete"],
+      "opportunities": ["create", "read", "update", "delete"],
+      "action_items": ["create", "read", "update", "delete"],
+      "contacts": ["create", "read", "update", "delete"]
+    }
+  },
+  "Sales Head": {
+    "description": "Access to sales activity and contacts.",
+    "permissions": {
+      "sales_activity": ["create", "read", "update", "delete"],
+      "contacts": ["create", "read", "update", "delete"]
+    }
+  },
+  "Delivery Manager": {
+    "description": "Access to action items only.",
+    "permissions": {
+      "action_items": ["create", "read", "update", "delete"]
+    }
+  }
+}

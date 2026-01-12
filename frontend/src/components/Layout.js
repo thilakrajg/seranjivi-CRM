@@ -6,7 +6,6 @@ import {
   Users,
   Building2,
   Briefcase,
-  FolderKanban,
   Target,
   TrendingUp,
   FileText,
@@ -19,7 +18,8 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  UserCog
+  UserCog,
+  FolderKanban
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -39,24 +39,20 @@ const Layout = ({ children }) => {
   const [projectsOpen, setProjectsOpen] = useState(true);
 
   const navigation = [
-    { name: 'Clients', href: '/clients', icon: Building2 },
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Client', href: '/clients', icon: Building2 },
     { name: 'Client Overview', href: '/client-overview', icon: Users },
-    { name: 'Partners', href: '/partners', icon: Briefcase },
-    { name: 'Employees', href: '/employees', icon: Users },
-    { name: 'User Management', href: '/user-management', icon: UserCog },
-    { name: 'Leads', href: '/leads', icon: Target },
-    { name: 'Opportunities', href: '/opportunities', icon: TrendingUp },
-    { name: 'Action Items', href: '/action-items', icon: Target },
     { name: 'Sales Activity', href: '/sales-activity', icon: Activity },
-    { name: 'Forecast', href: '/forecast', icon: TrendingUp },
-    { name: 'SOW', href: '/sow', icon: FileText },
+    { name: 'Lead', href: '/leads', icon: Target },
+    { name: 'Opportunity', href: '/opportunities', icon: TrendingUp },
     {
       name: 'Projects',
       href: '/projects',
       icon: FolderKanban,
       children: [{ name: 'Hiring Request', href: '/projects/hiring-requests' }],
     },
-    { name: 'Activities', href: '/activities', icon: Activity },
+    { name: 'Action Items', href: '/action-items', icon: Target },
+    { name: 'User Management', href: '/user-management', icon: UserCog },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 

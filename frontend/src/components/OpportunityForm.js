@@ -11,10 +11,23 @@ import DateField from './DateField';
 
 const OpportunityForm = ({ opportunity, onClose }) => {
   const [formData, setFormData] = useState({
-    client_name: '',
     opportunity_name: '',
-    created_at: '', // Editable Date field - sent to backend
-    // New fields
+    account_id: '',
+    primary_contact_id: '',
+    owner_id: '',
+    amount: 0,
+    currency_code: 'USD',
+    close_date: '',
+    stage_name: 'Prospect',
+    probability: 10,
+    type: 'New Business',
+    lead_source: '',
+    next_step: '',
+    loss_reason: '',
+    description: '',
+    // Keep existing fields for backward compatibility
+    client_name: '',
+    created_at: '',
     deal_value: 0,
     probability_percent: 0,
     win_loss_reason: '',
@@ -22,14 +35,12 @@ const OpportunityForm = ({ opportunity, onClose }) => {
     next_action: '',
     partner_org: '',
     partner_org_contact: '',
-    // Existing fields
     industry: '',
     region: '',
     country: '',
     solution: '',
     estimated_value: 0,
     currency: 'USD',
-    probability: 0,
     stage: 'Prospecting',
     expected_closure_date: '',
     sales_owner: '',
@@ -48,8 +59,47 @@ const OpportunityForm = ({ opportunity, onClose }) => {
     if (opportunity) {
       setFormData({
         ...opportunity,
-        expected_closure_date: opportunity.expected_closure_date?.split('T')[0] || '',
+        // Map new fields
+        opportunity_name: opportunity.opportunity_name || '',
+        account_id: opportunity.account_id || '',
+        primary_contact_id: opportunity.primary_contact_id || '',
+        owner_id: opportunity.owner_id || '',
+        amount: opportunity.amount || 0,
+        currency_code: opportunity.currency_code || 'USD',
+        close_date: opportunity.close_date?.split('T')[0] || '',
+        stage_name: opportunity.stage_name || 'Prospect',
+        probability: opportunity.probability || 10,
+        type: opportunity.type || 'New Business',
+        lead_source: opportunity.lead_source || '',
+        next_step: opportunity.next_step || '',
+        loss_reason: opportunity.loss_reason || '',
+        description: opportunity.description || '',
+        // Keep existing fields for backward compatibility
+        client_name: opportunity.client_name || '',
         created_at: opportunity.created_at?.split('T')[0] || '',
+        deal_value: opportunity.deal_value || 0,
+        probability_percent: opportunity.probability_percent || 0,
+        win_loss_reason: opportunity.win_loss_reason || '',
+        last_interaction: opportunity.last_interaction?.split('T')[0] || '',
+        next_action: opportunity.next_action || '',
+        partner_org: opportunity.partner_org || '',
+        partner_org_contact: opportunity.partner_org_contact || '',
+        industry: opportunity.industry || '',
+        region: opportunity.region || '',
+        country: opportunity.country || '',
+        solution: opportunity.solution || '',
+        estimated_value: opportunity.estimated_value || 0,
+        currency: opportunity.currency || 'USD',
+        stage: opportunity.stage || 'Prospecting',
+        expected_closure_date: opportunity.expected_closure_date?.split('T')[0] || '',
+        sales_owner: opportunity.sales_owner || '',
+        technical_poc: opportunity.technical_poc || '',
+        presales_poc: opportunity.presales_poc || '',
+        key_stakeholders: opportunity.key_stakeholders || '',
+        competitors: opportunity.competitors || '',
+        next_steps: opportunity.next_steps || '',
+        risks: opportunity.risks || '',
+        status: opportunity.status || 'Active',
       });
       if (opportunity.attachments) {
         setAttachments(opportunity.attachments);
@@ -70,6 +120,24 @@ const OpportunityForm = ({ opportunity, onClose }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Auto-update probability based on stage
+    if (name === 'stage_name') {
+      const stageProbabilityMap = {
+        'Prospect': 10,
+        'Needs Analysis – Discovery': 20,
+        'Proposal / Price Quote': 30,
+        'Demo': 40,
+        'Negotiation': 50,
+        'Closed Won': 100,
+        'Closed Lost': 0
+      };
+      setFormData((prev) => ({ 
+        ...prev, 
+        [name]: value,
+        probability: stageProbabilityMap[value] || 10 
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -78,8 +146,51 @@ const OpportunityForm = ({ opportunity, onClose }) => {
 
     try {
       const payload = { ...formData };
-      if (payload.estimated_value) payload.estimated_value = parseFloat(payload.estimated_value);
-      if (payload.probability) payload.probability = parseInt(payload.probability);
+      
+      // Map new standardized fields to backend format
+      const submitPayload = {
+        // Core fields
+        opportunity_name: payload.opportunity_name,
+        account_id: payload.account_id,
+        primary_contact_id: payload.primary_contact_id,
+        owner_id: payload.owner_id,
+        amount: parseFloat(payload.amount) || 0,
+        currency_code: payload.currency_code,
+        close_date: payload.close_date,
+        stage_name: payload.stage_name,
+        probability: parseInt(payload.probability) || 10,
+        type: payload.type,
+        lead_source: payload.lead_source,
+        next_step: payload.next_step,
+        loss_reason: payload.stage_name === 'Closed Lost' ? payload.loss_reason : null,
+        description: payload.description,
+        // Keep backward compatibility fields
+        client_name: payload.account_id, // Map account_id to client_name for compatibility
+        created_at: payload.created_at,
+        deal_value: parseFloat(payload.amount) || 0,
+        probability_percent: parseInt(payload.probability) || 0,
+        win_loss_reason: payload.stage_name === 'Closed Lost' ? payload.loss_reason : '',
+        last_interaction: payload.close_date,
+        next_action: payload.next_step,
+        partner_org: payload.partner_org,
+        partner_org_contact: payload.partner_org_contact,
+        industry: payload.industry,
+        region: payload.region,
+        country: payload.country,
+        solution: payload.solution,
+        estimated_value: parseFloat(payload.amount) || 0,
+        currency: payload.currency_code,
+        stage: payload.stage_name,
+        expected_closure_date: payload.close_date,
+        sales_owner: payload.owner_id, // Map owner_id to sales_owner
+        technical_poc: payload.technical_poc,
+        presales_poc: payload.presales_poc,
+        key_stakeholders: payload.key_stakeholders,
+        competitors: payload.competitors,
+        next_steps: payload.next_step,
+        risks: payload.risks,
+        status: payload.stage_name === 'Closed Won' ? 'Won' : payload.stage_name === 'Closed Lost' ? 'Lost' : 'Active'
+      };
 
       // Convert File objects to metadata
       const attachmentMetadata = attachments.map(file => {
@@ -100,16 +211,16 @@ const OpportunityForm = ({ opportunity, onClose }) => {
         }
       });
 
-      payload.attachments = attachmentMetadata;
+      submitPayload.attachments = attachmentMetadata;
 
       if (opportunity) {
-        await api.put(`/opportunities/${opportunity.id}`, payload);
+        await api.put(`/opportunities/${opportunity.id}`, submitPayload);
         toast.success('Opportunity updated successfully');
-        if (payload.stage === 'Closed Won') {
+        if (submitPayload.stage_name === 'Closed Won') {
           toast.success('Opportunity automatically converted to SOW!');
         }
       } else {
-        await api.post('/opportunities', payload);
+        await api.post('/opportunities', submitPayload);
         toast.success('Opportunity created successfully');
       }
       onClose();
@@ -136,14 +247,25 @@ const OpportunityForm = ({ opportunity, onClose }) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="client_name">Client / Account *</Label>
+          <Label htmlFor="account_id">Account *</Label>
           <Input
-            id="client_name"
-            name="client_name"
-            value={formData.client_name}
+            id="account_id"
+            name="account_id"
+            value={formData.account_id}
             onChange={handleChange}
             required
-            data-testid="opportunity-client-input"
+            data-testid="opportunity-account-input"
+          />
+        </div>
+        <div>
+          <Label htmlFor="primary_contact_id">Primary Contact</Label>
+          <Input
+            id="primary_contact_id"
+            name="primary_contact_id"
+            value={formData.primary_contact_id}
+            onChange={handleChange}
+            placeholder="Select contact..."
+            data-testid="opportunity-contact-input"
           />
         </div>
         <div>
@@ -157,76 +279,103 @@ const OpportunityForm = ({ opportunity, onClose }) => {
             data-testid="opportunity-name-input"
           />
         </div>
-        <DateField 
-          name="created_at"
-          label="Date"
-          value={formData.created_at}
-          onChange={handleChange}
-          required={true}
-        />
         
-        {/* Task ID Display (Read-only) */}
-        {opportunity && opportunity.task_id && (
-          <div>
-            <Label htmlFor="task_id">Task ID</Label>
-            <Input
-              id="task_id"
-              value={opportunity.task_id}
-              readOnly
-              disabled
-              className="bg-slate-50 cursor-not-allowed font-['JetBrains_Mono'] font-semibold"
-            />
-          </div>
-        )}
-        
-        {/* New Fields */}
         <div>
-          <Label htmlFor="deal_value">Deal Value *</Label>
+          <Label htmlFor="owner_id">PreSales Owner *</Label>
           <Input
-            id="deal_value"
-            name="deal_value"
-            type="number"
-            value={formData.deal_value}
+            id="owner_id"
+            name="owner_id"
+            value={formData.owner_id}
             onChange={handleChange}
             required
-            placeholder="Enter deal value"
+            placeholder="Assign owner..."
+            data-testid="opportunity-owner-input"
           />
         </div>
         
         <div>
-          <Label htmlFor="probability_percent">Probability % *</Label>
+          <Label htmlFor="amount">Amount</Label>
           <Input
-            id="probability_percent"
-            name="probability_percent"
+            id="amount"
+            name="amount"
+            type="number"
+            value={formData.amount}
+            onChange={handleChange}
+            placeholder="Enter amount"
+            data-testid="opportunity-amount-input"
+          />
+        </div>
+        
+        <div>
+          <Label htmlFor="probability">Probability (%)</Label>
+          <Input
+            id="probability"
+            name="probability"
             type="number"
             min="0"
             max="100"
-            value={formData.probability_percent}
+            value={formData.probability}
             onChange={handleChange}
-            required
-            placeholder="0-100"
+            placeholder="Auto-populated based on Stage"
+            readOnly
+            className="bg-slate-50 cursor-not-allowed"
+            data-testid="opportunity-probability-input"
           />
         </div>
         
         <div>
-          <Label htmlFor="last_interaction">Last Interaction Date</Label>
+          <Label htmlFor="close_date">Close Date</Label>
           <Input
-            id="last_interaction"
-            name="last_interaction"
+            id="close_date"
+            name="close_date"
             type="date"
-            value={formData.last_interaction?.split('T')[0] || ''}
+            value={formData.close_date}
             onChange={handleChange}
+            data-testid="opportunity-close-date-input"
           />
         </div>
         
         <div>
-          <Label htmlFor="next_action">Next Action</Label>
+          <Label htmlFor="type">Type</Label>
+          <Select name="type" value={formData.type} onValueChange={(value) => setFormData((prev) => ({ ...prev, type: value }))}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="New Business">New Business</SelectItem>
+              <SelectItem value="Existing">Existing</SelectItem>
+              <SelectItem value="Renewal">Renewal</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div>
+          <Label htmlFor="lead_source">Lead Source</Label>
+          <Select name="lead_source" value={formData.lead_source} onValueChange={(value) => setFormData((prev) => ({ ...prev, lead_source: value }))}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Web">Web</SelectItem>
+              <SelectItem value="Referral">Referral</SelectItem>
+              <SelectItem value="Partner">Partner</SelectItem>
+              <SelectItem value="Cold Call">Cold Call</SelectItem>
+              <SelectItem value="Email">Email</SelectItem>
+              <SelectItem value="Social">Social Media</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div>
+          <Label htmlFor="next_step">Next Step</Label>
           <Input
-            id="next_action"
-            name="next_action"
-            value={formData.next_action}
+            id="next_step"
+            name="next_step"
+            value={formData.next_step}
             onChange={handleChange}
-            placeholder="What's the next step?"
+            placeholder="Immediate follow-up action"
+            data-testid="opportunity-next-step-input"
           />
         </div>
         
@@ -254,12 +403,7 @@ const OpportunityForm = ({ opportunity, onClose }) => {
         
         <div>
           <Label htmlFor="industry">Industry</Label>
-          <Input
-            id="industry"
-            name="industry"
-            value={formData.industry}
-            onChange={handleChange}
-          />
+          <Input id="industry" name="industry" value={formData.industry} onChange={handleChange} />
         </div>
         <div>
           <Label htmlFor="region">Region</Label>
@@ -273,45 +417,26 @@ const OpportunityForm = ({ opportunity, onClose }) => {
           <Label htmlFor="solution">Solution / Offering</Label>
           <Input id="solution" name="solution" value={formData.solution} onChange={handleChange} />
         </div>
-        <div>
-          <Label htmlFor="currency">Currency</Label>
-          <Select name="currency" value={formData.currency} onValueChange={(value) => setFormData((prev) => ({ ...prev, currency: value }))}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="USD">USD</SelectItem>
-              <SelectItem value="EUR">EUR</SelectItem>
-              <SelectItem value="GBP">GBP</SelectItem>
-              <SelectItem value="INR">INR</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="stage">Stage *</Label>
-          <Select name="stage" value={formData.stage} onValueChange={(value) => setFormData((prev) => ({ ...prev, stage: value }))}>
-            <SelectTrigger data-testid="opportunity-stage-select">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Prospecting">Prospecting</SelectItem>
-              <SelectItem value="Needs Analysis">Needs Analysis</SelectItem>
-              <SelectItem value="Proposal">Proposal</SelectItem>
-              <SelectItem value="Negotiation">Negotiation</SelectItem>
-              <SelectItem value="Closed">Closed (Move to Action Items)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="win_loss_reason">Win/Loss Reason</Label>
-          <Input
-            id="win_loss_reason"
-            name="win_loss_reason"
-            value={formData.win_loss_reason}
-            onChange={handleChange}
-            placeholder="Why won or lost?"
-          />
-        </div>
+        
+        {formData.stage_name === 'Closed Lost' && (
+          <div>
+            <Label htmlFor="loss_reason">Loss Reason *</Label>
+            <Select name="loss_reason" value={formData.loss_reason} onValueChange={(value) => setFormData((prev) => ({ ...prev, loss_reason: value }))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Price">Price</SelectItem>
+                <SelectItem value="Competition">Competition</SelectItem>
+                <SelectItem value="Timing">Timing</SelectItem>
+                <SelectItem value="Requirements">Requirements</SelectItem>
+                <SelectItem value="Relationship">Relationship</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        
         <div>
           <Label htmlFor="expected_closure_date">Expected Closure Date</Label>
           <Input
@@ -322,67 +447,63 @@ const OpportunityForm = ({ opportunity, onClose }) => {
             onChange={handleChange}
           />
         </div>
+        
         <div>
           <Label htmlFor="sales_owner">Sales Owner</Label>
           <Input id="sales_owner" name="sales_owner" value={formData.sales_owner} onChange={handleChange} />
         </div>
+        
         <div>
           <Label htmlFor="technical_poc">Technical PoC</Label>
           <Input id="technical_poc" name="technical_poc" value={formData.technical_poc} onChange={handleChange} />
         </div>
+        
         <div>
           <Label htmlFor="presales_poc">Presales PoC</Label>
           <Input id="presales_poc" name="presales_poc" value={formData.presales_poc} onChange={handleChange} />
         </div>
+        
         <div>
           <Label htmlFor="key_stakeholders">Key Stakeholders</Label>
           <Input id="key_stakeholders" name="key_stakeholders" value={formData.key_stakeholders} onChange={handleChange} />
         </div>
+        
         <div>
           <Label htmlFor="competitors">Competitors</Label>
           <Input id="competitors" name="competitors" value={formData.competitors} onChange={handleChange} />
         </div>
-      </div>
+        
+        <div>
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={4}
+            placeholder="Internal notes"
+            data-testid="opportunity-description-input"
+          />
+        </div>
+        
+        <div>
+          <Label>Attachments</Label>
+          <MultiFileUpload files={attachments} onChange={setAttachments} />
+        </div>
 
-      <div>
-        <Label htmlFor="next_steps">Next Steps</Label>
-        <Textarea
-          id="next_steps"
-          name="next_steps"
-          value={formData.next_steps}
-          onChange={handleChange}
-          rows={2}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="risks">Risks / Blockers</Label>
-        <Textarea
-          id="risks"
-          name="risks"
-          value={formData.risks}
-          onChange={handleChange}
-          rows={2}
-        />
-      </div>
-
-      <div>
-        <Label>Attachments</Label>
-        <MultiFileUpload files={attachments} onChange={setAttachments} />
-      </div>
-
-      <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          disabled={loading}
-          data-testid="opportunity-form-submit"
-          className="bg-[#0A2A43] hover:bg-[#0A2A43]/90"
-        >
-          {loading ? 'Saving...' : opportunity ? 'Update' : 'Create'}
-        </Button>
+        <div className="flex justify-end gap-2 pt-4">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={loading}
+            data-testid="opportunity-form-submit"
+            className="bg-[#0A2A43] hover:bg-[#0A2A43]/90"
+          >
+            {loading ? 'Saving...' : opportunity ? 'Update' : 'Create'}
+          </Button>
+        </div>
       </div>
     </form>
   );

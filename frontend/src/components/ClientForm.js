@@ -19,13 +19,11 @@ const ClientForm = ({ client, onClose }) => {
     industry: '',
     customer_type: 'Direct Customer',
     gst_tax_id: '',
-    address: '',
-    country: '',
-    region: '',
+    addresses: [{ address: '', country: '', region: '' }],
     account_owner: '',
     client_status: 'Active',
     notes: '',
-    contact_persons: [{ name: '', email: '', phone: '' }]
+    contact_persons: [{ name: '', email: '', phone: '', designation: '', is_primary: false }]
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -39,15 +37,15 @@ const ClientForm = ({ client, onClose }) => {
         industry: client.industry || '',
         customer_type: client.customer_type || 'Direct Customer',
         gst_tax_id: client.gst_tax_id || '',
-        address: client.address || '',
-        country: client.country || '',
-        region: client.region || '',
+        addresses: client.addresses && client.addresses.length > 0 
+          ? client.addresses 
+          : [{ address: '', country: '', region: '' }],
         account_owner: client.account_owner || '',
         client_status: client.client_status || 'Active',
         notes: client.notes || '',
         contact_persons: client.contact_persons && client.contact_persons.length > 0 
           ? client.contact_persons 
-          : [{ name: '', email: '', phone: '' }]
+          : [{ name: '', email: '', phone: '', designation: '', is_primary: false }]
       });
     }
   }, [client]);
@@ -63,14 +61,54 @@ const ClientForm = ({ client, onClose }) => {
 
   const handleContactChange = (index, field, value) => {
     const updatedContacts = [...formData.contact_persons];
-    updatedContacts[index][field] = value;
+    
+    if (field === 'is_primary') {
+      // If setting as primary, uncheck all others
+      if (value) {
+        updatedContacts.forEach((contact, i) => {
+          contact.is_primary = i === index;
+        });
+      } else {
+        updatedContacts[index].is_primary = false;
+      }
+    } else if (field === 'phone') {
+      // Only allow digits and +, max 10 digits after country code
+      const cleaned = value.replace(/[^\d+]/g, '');
+      const digitsOnly = cleaned.replace(/^\+/, '');
+      if (digitsOnly.length <= 10) {
+        updatedContacts[index][field] = value;
+      }
+    } else {
+      updatedContacts[index][field] = value;
+    }
+    
     setFormData(prev => ({ ...prev, contact_persons: updatedContacts }));
+  };
+
+  const handleAddressChange = (index, field, value) => {
+    const updatedAddresses = [...formData.addresses];
+    updatedAddresses[index][field] = value;
+    setFormData(prev => ({ ...prev, addresses: updatedAddresses }));
+  };
+
+  const addAddress = () => {
+    setFormData(prev => ({
+      ...prev,
+      addresses: [...prev.addresses, { address: '', country: '', region: '' }]
+    }));
+  };
+
+  const removeAddress = (index) => {
+    if (formData.addresses.length > 1) {
+      const updatedAddresses = formData.addresses.filter((_, i) => i !== index);
+      setFormData(prev => ({ ...prev, addresses: updatedAddresses }));
+    }
   };
 
   const addContact = () => {
     setFormData(prev => ({
       ...prev,
-      contact_persons: [...prev.contact_persons, { name: '', email: '', phone: '' }]
+      contact_persons: [...prev.contact_persons, { name: '', email: '', phone: '', designation: '', is_primary: false }]
     }));
   };
 
@@ -99,7 +137,11 @@ const ClientForm = ({ client, onClose }) => {
     }
     
     if (!formData.country) {
-      newErrors.country = 'Country is required';
+      // Check if at least one address has a country
+      const hasCountry = formData.addresses.some(addr => addr.country);
+      if (!hasCountry) {
+        newErrors.country = 'At least one address must have a country';
+      }
     }
     
     if (!formData.account_owner) {
@@ -127,9 +169,17 @@ const ClientForm = ({ client, onClose }) => {
     try {
       const submitData = {
         ...formData,
+        // For backward compatibility, use first address as primary
+        address: formData.addresses[0]?.address || '',
+        country: formData.addresses[0]?.country || '',
+        region: formData.addresses[0]?.region || '',
         // Keep primary email as contact_email for backward compatibility
         contact_persons: formData.contact_persons.filter(contact => 
           contact.name || contact.email || contact.phone
+        ),
+        // Include all addresses
+        addresses: formData.addresses.filter(addr => 
+          addr.address || addr.country || addr.region
         )
       };
 
@@ -190,7 +240,7 @@ const ClientForm = ({ client, onClose }) => {
               )}
             </div>
             <div>
-              <Label htmlFor="contact_email">Primary Email *</Label>
+              <Label htmlFor="contact_email">Email *</Label>
               <Input
                 id="contact_email"
                 name="contact_email"
@@ -218,14 +268,34 @@ const ClientForm = ({ client, onClose }) => {
             </div>
             <div>
               <Label htmlFor="industry">Industry</Label>
-              <Input
-                id="industry"
-                name="industry"
+              <Select
                 value={formData.industry}
-                onChange={handleChange}
-                placeholder="e.g. Technology, Healthcare"
-                data-testid="client-industry-input"
-              />
+                onValueChange={(value) => setFormData(prev => ({ ...prev, industry: value }))}
+                data-testid="client-industry-select"
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select industry..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Technology">Technology</SelectItem>
+                  <SelectItem value="Healthcare">Healthcare</SelectItem>
+                  <SelectItem value="Finance">Finance</SelectItem>
+                  <SelectItem value="Manufacturing">Manufacturing</SelectItem>
+                  <SelectItem value="Retail">Retail</SelectItem>
+                  <SelectItem value="Education">Education</SelectItem>
+                  <SelectItem value="Government">Government</SelectItem>
+                  <SelectItem value="Construction">Construction</SelectItem>
+                  <SelectItem value="Transportation">Transportation</SelectItem>
+                  <SelectItem value="Energy">Energy</SelectItem>
+                  <SelectItem value="Agriculture">Agriculture</SelectItem>
+                  <SelectItem value="Media">Media</SelectItem>
+                  <SelectItem value="Telecommunications">Telecommunications</SelectItem>
+                  <SelectItem value="Consulting">Consulting</SelectItem>
+                  <SelectItem value="Real Estate">Real Estate</SelectItem>
+                  <SelectItem value="Hospitality">Hospitality</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="customer_type">Customer Type *</Label>
@@ -266,7 +336,7 @@ const ClientForm = ({ client, onClose }) => {
           <h3 className="text-lg font-medium text-[#0A2A43] mb-4">Contact Persons</h3>
           <div className="space-y-4">
             {formData.contact_persons.map((contact, index) => (
-              <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+              <div key={index} className="grid grid-cols-1 md:grid-cols-6 gap-4 items-start">
                 <div>
                   <Label htmlFor={`contact_name_${index}`}>Name</Label>
                   <Input
@@ -298,6 +368,30 @@ const ClientForm = ({ client, onClose }) => {
                     placeholder="+1 234 567 8900"
                     data-testid={`contact-phone-${index}`}
                   />
+                </div>
+                <div>
+                  <Label htmlFor={`contact_designation_${index}`}>Designation</Label>
+                  <Input
+                    id={`contact_designation_${index}`}
+                    value={contact.designation}
+                    onChange={(e) => handleContactChange(index, 'designation', e.target.value)}
+                    placeholder="e.g. Manager, Director"
+                    data-testid={`contact-designation-${index}`}
+                  />
+                </div>
+                <div className="flex items-end">
+                  <div className="flex items-center space-x-2 mt-6">
+                    <input
+                      type="checkbox"
+                      id={`primary_contact_${index}`}
+                      checked={contact.is_primary}
+                      onChange={(e) => handleContactChange(index, 'is_primary', e.target.checked)}
+                      data-testid={`primary-contact-${index}`}
+                    />
+                    <Label htmlFor={`primary_contact_${index}`} className="text-sm">
+                      Primary Contact
+                    </Label>
+                  </div>
                 </div>
                 <div className="flex items-end">
                   {formData.contact_persons.length > 1 && (
@@ -331,44 +425,85 @@ const ClientForm = ({ client, onClose }) => {
         {/* Section 3 - Address Details */}
         <div>
           <h3 className="text-lg font-medium text-[#0A2A43] mb-4">Address Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <Label htmlFor="address">Address</Label>
-              <Textarea
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                rows={3}
-                placeholder="123 Main St, Suite 100, City, State 12345"
-                data-testid="client-address-input"
-              />
-            </div>
-            <div>
-              <Label htmlFor="country">Country *</Label>
-              <CountryDropdown
-                value={formData.country}
-                onChange={(value) => setFormData(prev => ({ ...prev, country: value }))}
-                region={formData.region}
-                placeholder="Select country..."
-                required={true}
-                showRequiredIndicator={true}
-                className={errors.country ? 'border-red-500' : ''}
-                data-testid="client-country-dropdown"
-              />
-              {errors.country && (
-                <p className="text-red-500 text-sm mt-1">{errors.country}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="region">Region / State</Label>
-              <RegionDropdown
-                value={formData.region}
-                onChange={(value) => setFormData(prev => ({ ...prev, region: value }))}
-                placeholder="Select region..."
-                data-testid="client-region-dropdown"
-              />
-            </div>
+          <div className="space-y-4">
+            {formData.addresses.map((address, index) => (
+              <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start p-4 border rounded-lg">
+                <div className="md:col-span-2">
+                  <Label htmlFor={`address_${index}`}>Address</Label>
+                  <Textarea
+                    id={`address_${index}`}
+                    value={address.address}
+                    onChange={(e) => handleAddressChange(index, 'address', e.target.value)}
+                    rows={3}
+                    placeholder="123 Main St, Suite 100, City, State 12345"
+                    data-testid={`address-${index}`}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`country_${index}`}>Country *</Label>
+                  <CountryDropdown
+                    value={address.country}
+                    onChange={(value) => handleAddressChange(index, 'country', value)}
+                    region={address.region}
+                    placeholder="Select country..."
+                    required={true}
+                    showRequiredIndicator={true}
+                    className={errors.country ? 'border-red-500' : ''}
+                    data-testid={`country-${index}`}
+                  />
+                  {errors.country && (
+                    <p className="text-red-500 text-sm mt-1">{errors.country}</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor={`region_${index}`}>Region / State</Label>
+                  <Select
+                    value={address.region}
+                    onValueChange={(value) => handleAddressChange(index, 'region', value)}
+                    data-testid={`region-${index}`}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select region..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="North America">North America</SelectItem>
+                      <SelectItem value="South America">South America</SelectItem>
+                      <SelectItem value="Europe">Europe</SelectItem>
+                      <SelectItem value="Asia">Asia</SelectItem>
+                      <SelectItem value="Africa">Africa</SelectItem>
+                      <SelectItem value="Oceania">Oceania</SelectItem>
+                      <SelectItem value="Middle East">Middle East</SelectItem>
+                      <SelectItem value="Central America">Central America</SelectItem>
+                      <SelectItem value="Caribbean">Caribbean</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-end">
+                  {formData.addresses.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removeAddress(index)}
+                      className="text-red-500 hover:text-red-700"
+                      data-testid={`remove-address-${index}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addAddress}
+              className="flex items-center gap-2"
+              data-testid="add-address-button"
+            >
+              <Plus className="w-4 h-4" />
+              Add Address
+            </Button>
           </div>
         </div>
 

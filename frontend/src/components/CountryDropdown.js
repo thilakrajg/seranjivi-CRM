@@ -21,13 +21,25 @@ const CountryDropdown = ({
     if (region) {
       loadCountries(region);
     } else {
-      setCountries([]);
-      // Clear country value when region is cleared
-      if (value) {
-        onChange('');
-      }
+      loadAllCountries();
     }
   }, [region]);
+
+  const loadAllCountries = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const allCountries = await masterDataService.getCountries();
+      const countryNames = allCountries.map(country => country.name || country.country_name);
+      setCountries(countryNames);
+    } catch (err) {
+      setError('Failed to load countries');
+      console.error('Error loading all countries:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadCountries = async (selectedRegion) => {
     try {
@@ -53,14 +65,6 @@ const CountryDropdown = ({
     onChange(selectedValue);
   };
 
-  if (!region) {
-    return (
-      <div className="text-slate-500 text-sm">
-        Select a region first
-      </div>
-    );
-  }
-
   if (loading) {
     return (
       <div className="flex items-center gap-2 text-slate-500 text-sm">
@@ -82,7 +86,7 @@ const CountryDropdown = ({
   if (countries.length === 0) {
     return (
       <div className="text-slate-500 text-sm">
-        No countries available for this region
+        No countries available
       </div>
     );
   }

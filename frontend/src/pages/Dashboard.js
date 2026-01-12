@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { Users, Building2, Target, TrendingUp, FileText, Activity, DollarSign, TrendingDown, Calendar } from 'lucide-react';
+import { Users, Building2, Target, TrendingUp, FileText, Activity, DollarSign, TrendingDown, Calendar, Briefcase, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -144,6 +144,144 @@ const Dashboard = () => {
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      {/* KPI Cards - Horizontal Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Leads KPI Card */}
+        <Card className="border-slate-200" data-testid="leads-kpi-card">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold font-['Manrope'] flex items-center gap-2">
+              <Target className="h-5 w-5 text-[#2C6AA6]" />
+              Leads
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600">Total</span>
+              <span className="text-lg font-bold text-slate-900 font-['JetBrains_Mono']">
+                {(analytics?.leads?.total_leads || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600 flex items-center gap-1">
+                <Clock className="h-3 w-3 text-amber-500" />
+                In Progress
+              </span>
+              <span className="text-lg font-bold text-amber-600 font-['JetBrains_Mono']">
+                {(analytics?.leads?.in_progress || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600 flex items-center gap-1">
+                <CheckCircle className="h-3 w-3 text-emerald-500" />
+                Completed
+              </span>
+              <span className="text-lg font-bold text-emerald-600 font-['JetBrains_Mono']">
+                {(analytics?.leads?.completed || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600 flex items-center gap-1">
+                <XCircle className="h-3 w-3 text-red-500" />
+                Lost
+              </span>
+              <span className="text-lg font-bold text-red-600 font-['JetBrains_Mono']">
+                {(analytics?.leads?.lost || 0).toLocaleString()}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Opportunities KPI Card */}
+        <Card className="border-slate-200" data-testid="opportunities-kpi-card">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold font-['Manrope'] flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-emerald-500" />
+              Opportunities
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600">Total</span>
+              <span className="text-lg font-bold text-slate-900 font-['JetBrains_Mono']">
+                {(analytics?.pipeline?.total_opportunities || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600 flex items-center gap-1">
+                <Clock className="h-3 w-3 text-amber-500" />
+                In Progress
+              </span>
+              <span className="text-lg font-bold text-amber-600 font-['JetBrains_Mono']">
+                {(analytics?.pipeline?.in_progress || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600 flex items-center gap-1">
+                <CheckCircle className="h-3 w-3 text-emerald-500" />
+                Completed (Won)
+              </span>
+              <span className="text-lg font-bold text-emerald-600 font-['JetBrains_Mono']">
+                {(analytics?.pipeline?.won || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600 flex items-center gap-1">
+                <XCircle className="h-3 w-3 text-red-500" />
+                Lost
+              </span>
+              <span className="text-lg font-bold text-red-600 font-['JetBrains_Mono']">
+                {(analytics?.pipeline?.lost || 0).toLocaleString()}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Projects KPI Card */}
+        <Card className="border-slate-200" data-testid="projects-kpi-card">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold font-['Manrope'] flex items-center gap-2">
+              <Briefcase className="h-5 w-5 text-purple-500" />
+              Projects
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600">Total</span>
+              <span className="text-lg font-bold text-slate-900 font-['JetBrains_Mono']">
+                {(analytics?.projects?.total_projects || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600 flex items-center gap-1">
+                <Clock className="h-3 w-3 text-amber-500" />
+                In Progress
+              </span>
+              <span className="text-lg font-bold text-amber-600 font-['JetBrains_Mono']">
+                {(analytics?.projects?.in_progress || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600 flex items-center gap-1">
+                <CheckCircle className="h-3 w-3 text-emerald-500" />
+                Completed
+              </span>
+              <span className="text-lg font-bold text-emerald-600 font-['JetBrains_Mono']">
+                {(analytics?.projects?.completed || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600 flex items-center gap-1">
+                <XCircle className="h-3 w-3 text-red-500" />
+                Lost / Cancelled
+              </span>
+              <span className="text-lg font-bold text-red-600 font-['JetBrains_Mono']">
+                {(analytics?.projects?.cancelled || 0).toLocaleString()}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Stats Grid - Compact */}

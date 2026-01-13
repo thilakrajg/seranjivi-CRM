@@ -20,7 +20,7 @@ const Dashboard = () => {
       const response = await api.get('/dashboard/analytics', { params });
       setAnalytics(response.data);
     } catch (error) {
-      console.error('Failed to fetch analytics:', error);
+      console.error('Failed to fetch analytics:test', error);
     } finally {
       setLoading(false);
     }
